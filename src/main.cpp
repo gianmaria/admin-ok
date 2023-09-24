@@ -59,7 +59,7 @@ wstring date_time()
 wstring error_to_string(DWORD error)
 {
     LPVOID errorMessage;
-    DWORD flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM;
+    DWORD flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK;
     DWORD result = FormatMessage(
         flags,
         NULL,
@@ -125,7 +125,7 @@ std::vector<wstring> get_members_for_local_group(const wstring& local_group)
 
     if (error != NERR_Success)
     {
-        wcout << L"ERROR: NetLocalGroupGetMembers failed with code: " << error_to_string(error) << endl;
+        wcout << L"ERROR: NetLocalGroupGetMembers failed with code: " << error << endl;
         wcout << "  " << error_to_string(error) << endl;
         return users;
     }
@@ -179,7 +179,7 @@ bool add_account_to_group(const wstring& domain_and_name, const wstring& group)
 
     if (error != NERR_Success)
     {
-        wcout << L"ERROR: NetLocalGroupAddMembers failed with code: " << error_to_string(error) << endl;
+        wcout << L"ERROR: NetLocalGroupAddMembers failed with code: " << error << endl;
         wcout << "  " << error_to_string(error) << endl;
         return false;
     }
@@ -198,14 +198,6 @@ int wmain(int argc, wchar_t *argv[])
                 << "using: " << argv[0] << " <DOMAIN\\user> <GroupName>" << endl;
             return 1;
         }
-
-        //const std::wstring log_name = L"admin_ok.log";
-        //std::wofstream log(log_name, std::wofstream::app);
-        //
-        //if (not log.is_open())
-        //{
-        //    cout << "WARNING: no log available" << endl;
-        //}
 
         const auto account = wstring(argv[1]);
         const auto group = wstring(argv[2]);
