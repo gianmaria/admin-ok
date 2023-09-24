@@ -229,7 +229,11 @@ int wmain(int argc, wchar_t *argv[])
                 if (auto added = add_account_to_group(account, group);
                     added)
                 {
-                    wcout << date_time() << " account " << account << " added to group " << group << endl;
+                    wcout << date_time() << "(" << username << ") account " << account << " added to group " << group << endl;
+                }
+                else
+                {
+                    wcout << date_time() << "(" << username << ") " << "failed to add account " << account << " to group " << group << endl;
                 }
             }
             else
