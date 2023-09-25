@@ -201,7 +201,8 @@ int wmain(int argc, wchar_t *argv[])
 
         const auto account = wstring(argv[1]);
         const auto group = wstring(argv[2]);
-        
+        size_t sleep = 30; // sleep in seconds
+
         auto username = get_username_with_domain();
         wcout << date_time() << " INFO: you are (" << username << ")" << endl;
 
@@ -238,10 +239,10 @@ int wmain(int argc, wchar_t *argv[])
             }
             else
             {
-                wcout << date_time() << " (" << username << ") okega" << endl;
+                //wcout << date_time() << " (" << username << ") okega" << endl;
             }
 
-            sleep_for(seconds(5));
+            sleep_for(seconds(sleep));
         }
 
         return 0;
