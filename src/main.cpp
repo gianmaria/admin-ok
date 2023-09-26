@@ -147,7 +147,7 @@ std::vector<wstring> get_members_for_local_group(const wstring& local_group)
     {
         if (info[i].lgrmi2_sidusage != SidTypeUnknown)
         {
-            users.emplace_back(wstring(info[i].lgrmi2_domainandname));
+            users.emplace_back(info[i].lgrmi2_domainandname);
         }
     }
 
