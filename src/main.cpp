@@ -31,29 +31,25 @@ using std::this_thread::sleep_for;
 wstring date_time()
 {
     // Get the current system time
-    auto current_time = std::chrono::system_clock::now();
+    auto now = std::chrono::system_clock::now();
 
     // Convert the system time to a time_t type
-    std::time_t current_time_t = std::chrono::system_clock::to_time_t(current_time);
+    std::time_t current_time_t = std::chrono::system_clock::to_time_t(now);
 
-    // Convert the time_t value to a local time struct
-    std::tm local_time;
-    localtime_s(&local_time, &current_time_t); // Use localtime_s for safer multithreaded code
+    // Convert the time_t to a struct tm (for easy date and time extraction)
+    struct tm buf{};
+    auto err = localtime_s(&buf, &current_time_t);
 
-    // Extract date and time components
-    int year = local_time.tm_year + 1900; // Years since 1900
-    int month = local_time.tm_mon + 1;    // Months are 0-based
-    int day = local_time.tm_mday;         // Day of the month
-    int hour = local_time.tm_hour;        // Hour (24-hour clock)
-    int minute = local_time.tm_min;       // Minute
-    int second = local_time.tm_sec;       // Second
+    if (err != 0)
+    {
+        return L"";
+    }
 
-    std::wstringstream wss;
+    // Format the date and time
+    std::wstringstream formattedTime;
+    formattedTime << std::put_time(&buf, L"%Y-%m-%d %H:%M:%S");
 
-    wss << L"[" << day << L"-" << month << L"-" << year << L" "
-        << hour << ":" << minute << ":" << second << L"]";
-
-    return wss.str();
+    return formattedTime.str();
 }
 
 wstring error_to_string(DWORD error)
