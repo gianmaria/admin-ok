@@ -72,7 +72,7 @@ wstring date_time()
     std::time_t current_time_t = std::chrono::system_clock::to_time_t(now);
 
     // Convert the time_t to a struct tm (for easy date and time extraction)
-    struct tm buf{};
+    struct tm buf {};
     auto err = localtime_s(&buf, &current_time_t);
 
     if (err != 0)
@@ -218,7 +218,7 @@ bool add_account_to_group(const wstring& domain_and_name, const wstring& group)
     return true;
 }
 
-int wmain(int argc, wchar_t *argv[])
+int wmain(int argc, wchar_t* argv[])
 {
     try
     {
@@ -227,6 +227,7 @@ int wmain(int argc, wchar_t *argv[])
             wcout << "ERROR: not enough arguments" << endl
                 << "monitors whether the user is in the selected group or not" << endl
                 << "using: " << argv[0] << " <DOMAIN\\user> <GroupName>" << endl;
+
             return 1;
         }
 
@@ -278,11 +279,11 @@ int wmain(int argc, wchar_t *argv[])
 
         return 0;
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
         cout << "EXCEPTION: " << e.what() << endl;
     }
-    
+
     return 1;
 }
 
