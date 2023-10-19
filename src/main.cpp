@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <ctime>
 #include <exception>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -27,6 +28,40 @@ using std::endl;
 using std::wstring;
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
+
+wstring date_time();
+
+struct Log
+{
+    template<typename... Args>
+    inline void info(const std::wformat_string<Args...> fmt, Args&&... args)
+    {
+        wcout << L"[" << date_time() << L"]"
+            << L"[INFO] "
+            << std::vformat(fmt.get(), std::make_wformat_args(args...))
+            << '\n';
+    }
+
+    template<typename... Args>
+    inline void warn(const std::wformat_string<Args...> fmt, Args&&... args)
+    {
+        wcout << L"[" << date_time() << L"]"
+            << L"[WARN] "
+            << std::vformat(fmt.get(), std::make_wformat_args(args...))
+            << '\n';
+    }
+
+    template<typename... Args>
+    inline void err(const std::wformat_string<Args...> fmt, Args&&... args)
+    {
+        wcout << L"[" << date_time() << L"]"
+            << L"[ERR] "
+            << std::vformat(fmt.get(), std::make_wformat_args(args...))
+            << '\n';
+    }
+};
+
+static Log logger {};
 
 wstring date_time()
 {
