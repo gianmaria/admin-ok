@@ -25,6 +25,7 @@
 using std::cout;
 using std::wcout;
 using std::endl;
+using std::string;
 using std::wstring;
 using std::chrono::seconds;
 using std::this_thread::sleep_for;
@@ -62,6 +63,32 @@ struct Log
 };
 
 static Log logger {};
+
+wstring UTF8_to_wstring(const string& narrow)
+{
+    // Calculate the required buffer size for the wide string
+    int wide_str_len = MultiByteToWideChar(CP_UTF8, 0, narrow.c_str(), -1, nullptr, 0);
+
+    if (wide_str_len > 0) 
+    {
+        // Allocate a wide string buffer
+        auto wide_str = std::wstring(static_cast<size_t>(wide_str_len), L'\0');
+
+        // Convert the narrow string to a wide string
+        if (MultiByteToWideChar(CP_UTF8, 0, narrow.c_str(), -1, &wide_str[0], wide_str_len) > 0) 
+        {
+            return wide_str;
+        } 
+        else 
+        {
+            return L"";
+        }
+    }
+    else 
+    {
+        return L"";
+    }
+}
 
 wstring date_time()
 {
@@ -103,8 +130,7 @@ wstring error_to_string(DWORD error)
 
     if (result == 0)
     {
-        DWORD formatMessageError = GetLastError();
-        cout << "WARNING: FormatMessage failed with error code " << formatMessageError << endl;
+        logger.warn(L"FormatMessage failed with error code ({})", GetLastError());
         return L"";
     }
 
@@ -123,9 +149,7 @@ wstring get_username_with_domain()
     if (not GetUserNameExW(name_format, username, &username_size))
     {
         DWORD error = GetLastError();
-        cout << "ERROR: GetUserName failed with error code " << error << std::endl;
-        wcout << "  " << error_to_string(error) << endl;
-
+        logger.err(L"GetUserName failed with error code ({}): {}", error, error_to_string(error));
         return L"";
     }
 
@@ -134,7 +158,7 @@ wstring get_username_with_domain()
 
 std::vector<wstring> get_members_for_local_group(const wstring& local_group)
 {
-    std::vector<wstring> users;
+    std::vector<wstring> users {};
 
     const WCHAR* server_name = NULL;
     const WCHAR* localgroup_name = local_group.c_str();
@@ -156,26 +180,26 @@ std::vector<wstring> get_members_for_local_group(const wstring& local_group)
 
     if (error != NERR_Success)
     {
-        wcout << L"ERROR: NetLocalGroupGetMembers failed with code: " << error << endl;
-        wcout << "  " << error_to_string(error) << endl;
+        logger.err(L"NetLocalGroupGetMembers failed with code ({}): {}", error, error_to_string(error));
         return users;
     }
 
     if (info == NULL)
     {
-        cout << "ERROR: no group found" << endl;
+        logger.err(L"no group found");
         return users;
     }
 
     if (entries_read != total_entries)
     {
-        cout << "WARNING: not all entries have been enumerated" << endl;
+        logger.warn(L"not all entries have been enumerated");
     }
 
     for (DWORD i = 0;
          i < entries_read;
          ++i)
     {
+        // TODO: are we interested in other type of SID_NAME_USE?
         if (info[i].lgrmi2_sidusage == SidTypeUser)
         {
             users.emplace_back(info[i].lgrmi2_domainandname);
@@ -210,8 +234,7 @@ bool add_account_to_group(const wstring& domain_and_name, const wstring& group)
 
     if (error != NERR_Success)
     {
-        wcout << L"ERROR: NetLocalGroupAddMembers failed with code: " << error << endl;
-        wcout << "  " << error_to_string(error) << endl;
+        logger.err(L"NetLocalGroupAddMembers failed with code ({}): {}", error, error_to_string(error));
         return false;
     }
 
@@ -224,9 +247,9 @@ int wmain(int argc, wchar_t* argv[])
     {
         if (argc != 3)
         {
-            wcout << "ERROR: not enough arguments" << endl
-                << "monitors whether the user is in the selected group or not" << endl
-                << "using: " << argv[0] << " <DOMAIN\\user> <GroupName>" << endl;
+            wcout << "ERROR: not enough arguments" << endl;
+            wcout << "  monitors whether the user is in the selected group or not" << endl;
+            wcout << "  using: " << argv[0] << " <DOMAIN\\user> <GroupName>" << endl;
 
             return 1;
         }
@@ -236,7 +259,7 @@ int wmain(int argc, wchar_t* argv[])
         size_t sleep = 30; // sleep in seconds
 
         auto username = get_username_with_domain();
-        wcout << date_time() << " INFO: you are (" << username << ")" << endl;
+        logger.info(L"you are {}", username);
 
         for (;;)
         {
@@ -262,16 +285,17 @@ int wmain(int argc, wchar_t* argv[])
                 if (auto added = add_account_to_group(account, group);
                     added)
                 {
-                    wcout << date_time() << "(" << username << ") account " << account << " added to group " << group << endl;
+                    logger.info(L"{} account {} added to group {}", username, account, group);
                 }
                 else
                 {
-                    wcout << date_time() << "(" << username << ") " << "failed to add account " << account << " to group " << group << endl;
+                    logger.err(L"{} failed to add account {} to group {}", username, account, group);
                 }
             }
             else
             {
                 //wcout << date_time() << " (" << username << ") okega" << endl;
+                //logger.info(L"{} okega", username);
             }
 
             sleep_for(seconds(sleep));
@@ -281,7 +305,8 @@ int wmain(int argc, wchar_t* argv[])
     }
     catch (const std::exception& e)
     {
-        cout << "EXCEPTION: " << e.what() << endl;
+        //cout << "EXCEPTION: " << e.what() << endl;
+        logger.err(L"EXCEPTION: {}", UTF8_to_wstring(string(e.what())));
     }
 
     return 1;
