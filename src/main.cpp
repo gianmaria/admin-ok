@@ -63,6 +63,7 @@ struct Log
 };
 
 static Log logger {};
+static constexpr std::chrono::seconds g_sleep {30};
 
 wstring UTF8_to_wstring(const string& narrow)
 {
@@ -256,8 +257,7 @@ int wmain(int argc, wchar_t* argv[])
 
         const auto account = wstring(argv[1]);
         const auto group = wstring(argv[2]);
-        size_t sleep = 30; // sleep in seconds
-
+        
         auto username = get_username_with_domain();
         logger.info(L"you are {}", username);
 
@@ -298,7 +298,7 @@ int wmain(int argc, wchar_t* argv[])
                 //logger.info(L"{} okega", username);
             }
 
-            sleep_for(seconds(sleep));
+            sleep_for(g_sleep);
         }
 
         return 0;
