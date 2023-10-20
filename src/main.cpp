@@ -40,7 +40,7 @@ struct Log
         wcout << L"[" << date_time() << L"]"
             << L"[INFO] "
             << std::vformat(fmt.get(), std::make_wformat_args(args...))
-            << '\n';
+            << endl;
     }
 
     template<typename... Args>
@@ -49,7 +49,7 @@ struct Log
         wcout << L"[" << date_time() << L"]"
             << L"[WARN] "
             << std::vformat(fmt.get(), std::make_wformat_args(args...))
-            << '\n';
+            << endl;
     }
 
     template<typename... Args>
@@ -58,7 +58,7 @@ struct Log
         wcout << L"[" << date_time() << L"]"
             << L"[ERR] "
             << std::vformat(fmt.get(), std::make_wformat_args(args...))
-            << '\n';
+            << endl;
     }
 };
 
