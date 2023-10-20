@@ -287,11 +287,13 @@ int wmain(int argc, wchar_t* argv[])
                 if (auto added = add_account_to_group(account, group);
                     added)
                 {
-                    logger.info(L"{} account {} added to group {}", username, account, group);
+                    logger.info(L"{}: account '{}' added to group '{}'", 
+                                username, account, group);
                 }
                 else
                 {
-                    logger.err(L"{} failed to add account {} to group {}", username, account, group);
+                    logger.err(L"{}: failed to add account '{}' to group '{}'", 
+                               username, account, group);
                 }
             }
             else
