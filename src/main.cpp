@@ -63,6 +63,7 @@ struct Log
 };
 
 static Log logger {};
+static constexpr auto g_version {L"1.0.2"};
 static constexpr std::chrono::seconds g_sleep {30};
 
 wstring UTF8_to_wstring(const string& narrow)
@@ -259,6 +260,7 @@ int wmain(int argc, wchar_t* argv[])
         const auto group = wstring(argv[2]);
         
         auto username = get_username_with_domain();
+        logger.info(L"version {}", g_version);
         logger.info(L"you are {}", username);
 
         for (;;)
