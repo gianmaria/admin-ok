@@ -141,6 +141,9 @@ wstring error_to_string(DWORD error)
     return error_msg;
 }
 
+/*
+  Get the account in the form "DOMAIN\\User" that started the program
+*/
 wstring get_username_with_domain()
 {
     wchar_t username[256]; // Buffer to hold the username
